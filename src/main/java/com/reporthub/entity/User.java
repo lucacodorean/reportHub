@@ -2,15 +2,13 @@ package com.reporthub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
-@Table(name="users")
+@Table(name="users", schema="reporthub")
 @ToString
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements IModel {
@@ -42,6 +40,16 @@ public class User implements IModel {
     @Column(name = "is_banned")
     private Boolean isBanned;
 
-    @Column(name = "key")
-    private String key = generateKey(this);
+    @Column(name = "model_key")
+    private String modelKey = generateKey(this);
+
+    public User(String username, String email, String password, String phoneNumber) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.isModerator = false;
+        this.isBanned = false;
+        this.score = 0f;
+    }
 }

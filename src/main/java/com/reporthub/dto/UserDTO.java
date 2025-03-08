@@ -10,7 +10,7 @@ public class UserDTO {
     @NonNull private String phoneNumber;
     @NonNull private String email;
     @NonNull private Float score;
-    @NonNull private String key;
+    @NonNull private String modelKey;
 
     public UserDTO(User user) {
         if(user != null) {
@@ -18,7 +18,7 @@ public class UserDTO {
             this.phoneNumber    = user.getPhoneNumber();
             this.username       = user.getUsername();
             this.score          = user.getScore();
-            this.key            = user.getKey();
+            this.modelKey       = user.getModelKey();
         }
     }
 }
