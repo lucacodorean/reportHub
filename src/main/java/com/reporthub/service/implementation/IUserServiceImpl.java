@@ -34,6 +34,8 @@ public class IUserServiceImpl implements IUserService {
 
     public User findByEmail(String email) {return userRepository.findByEmail(email).orElse(null); }
 
+    public User findByUsername(String username ) { return userRepository.findByUsername(username); }
+
     public List<User> findAll() { return userRepository.findAll(); }
 
     public boolean delete(User entity) {

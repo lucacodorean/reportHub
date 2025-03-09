@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface IUserService extends IEntityService<User>, UserDetailsService {
     User findByEmail(String email);
+    User findByUsername(String username);
     String verify(String username, String password);
     User retrieveLoggedUser(String authHeader);
 }
