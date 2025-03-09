@@ -30,7 +30,7 @@ public class UserController {
     @GetMapping("/{key}")
     public ResponseEntity<UserDTO> get(@PathVariable String key) {
 
-        User temp = userService.findAll().stream().filter(user -> user.getModelKey().equals(key)).findFirst().orElse(null);
+        User temp = userService.findByKey(key);
         if(temp == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         return ResponseEntity.status(HttpStatus.OK).body(new UserDTO(temp));
@@ -38,7 +38,7 @@ public class UserController {
 
     @PatchMapping("/{key}")
     public ResponseEntity<UserDTO> update(@PathVariable String key, @RequestBody UserUpdateRequest request) {
-        User user = userService.findAll().stream().filter(temp -> temp.getModelKey().equals(key)).findFirst().orElse(null);
+        User user = userService.findByKey(key);
         if(user == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         if(request.getUsername() != null)       user.setUsername(request.getUsername());
