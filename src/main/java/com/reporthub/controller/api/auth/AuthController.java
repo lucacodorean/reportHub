@@ -31,7 +31,12 @@ public class AuthController {
     @ExceptionHandler({SQLException.class, JDBCException.class})
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request)  {
-        if(userService.findByEmail(request.getEmail()) != null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Map<String, String> message = new HashMap<>();
+
+        if(userService.findByEmail(request.getEmail()) != null) {
+            message.put("message", "User with this email already exists.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+        }
 
         try {
             UserDTO loggedUser = new UserDTO(
@@ -43,8 +48,7 @@ public class AuthController {
             loggedUser.attributes.put("JWT", userService.verify(loggedUser.getUsername(), request.getPassword()));
             return ResponseEntity.ok(loggedUser);
 
-        } catch (DataIntegrityViolationException e) {
-            Map<String, String> message = new HashMap<>();
+        } catch (Exception e) {
             message.put("message", e.getCause().getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
         }
