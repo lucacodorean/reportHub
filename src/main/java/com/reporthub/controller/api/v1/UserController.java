@@ -1,15 +1,15 @@
 package com.reporthub.controller.api.v1;
 
 import com.reporthub.dto.UserDTO;
+import com.reporthub.entity.User;
+import com.reporthub.request.UserUpdateRequest;
 import com.reporthub.service.IUserService;
 import com.reporthub.singleton.ServiceSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,13 +20,6 @@ public class UserController {
     @Autowired
     private final IUserService userService = ServiceSingleton.getUserService();
 
-    /*
-        index -> get All GET
-        api/v1/users/usr_.... -> un user GET
-        api/v1/users/usr_.... -> PATCH
-        api/v1/users/usr_.... -> DELETE
-     */
-
     @GetMapping("/")
     public ResponseEntity<List<UserDTO>> index() {
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -36,8 +29,35 @@ public class UserController {
 
     @GetMapping("/{key}")
     public ResponseEntity<UserDTO> get(@PathVariable String key) {
+
+        User temp = userService.findAll().stream().filter(user -> user.getModelKey().equals(key)).findFirst().orElse(null);
+        if(temp == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(new UserDTO(temp));
+    }
+
+    @PatchMapping("/{key}")
+    public ResponseEntity<UserDTO> update(@PathVariable String key, @RequestBody UserUpdateRequest request) {
+        User user = userService.findAll().stream().filter(temp -> temp.getModelKey().equals(key)).findFirst().orElse(null);
+        if(user == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        if(request.getUsername() != null)       user.setUsername(request.getUsername());
+        if(request.getPhoneNumber() != null)    user.setPhoneNumber(request.getPhoneNumber());
+        if(request.getEmail() != null)          user.setEmail(request.getEmail());
+        if(request.getScore() != null)          user.setScore(request.getScore());
+        if(request.getPassword() != null) {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+            user.setPassword(encoder.encode(request.getPassword()));
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(
-                new UserDTO(userService.findByKey(key))
+            new UserDTO(userService.save(user))
         );
+    }
+
+    @DeleteMapping("/{key}")
+    public ResponseEntity<Boolean> delete(@PathVariable String key) {
+        Boolean status = userService.delete(userService.findByKey(key));
+        return ResponseEntity.status(HttpStatus.OK).body(status);
     }
 }

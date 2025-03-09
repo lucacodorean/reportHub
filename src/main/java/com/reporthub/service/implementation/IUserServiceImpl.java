@@ -22,11 +22,7 @@ public class IUserServiceImpl implements IUserService {
     @Autowired
     private JwtService jwtService;
 
-    public User save(User entity) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-        entity.setPassword(encoder.encode(entity.getPassword()));
-        return userRepository.save(entity);
-    }
+    public User save(User entity) { return userRepository.save(entity); }
 
     public User findById(Long id) { return userRepository.findById(id).orElse(null); }
 

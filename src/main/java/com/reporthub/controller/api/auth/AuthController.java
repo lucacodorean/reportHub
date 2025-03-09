@@ -9,9 +9,9 @@ import com.reporthub.service.JwtService;
 import com.reporthub.singleton.ServiceSingleton;
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
@@ -39,9 +39,11 @@ public class AuthController {
         }
 
         try {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
             UserDTO loggedUser = new UserDTO(
                 userService.save(
-                    new User(request.getUsername(), request.getEmail(), request.getPassword(), request.getPhoneNumber())
+                    new User(request.getUsername(), request.getEmail(), encoder.encode(request.getPassword()), request.getPhoneNumber())
                 )
             );
 
