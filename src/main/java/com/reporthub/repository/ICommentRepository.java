@@ -1,19 +1,16 @@
 package com.reporthub.repository;
 
 import com.reporthub.entity.Comment;
-import com.reporthub.entity.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface ICommentRepository extends IPostableRepository<Comment> {
+public interface ICommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query
-    List<Comment> findByReport(Report report);
+    @Query("SELECT c FROM Comment c WHERE c.report.id = :reportId")
+    List<Comment> findCommentsByReportId(@Param("reportId") Long reportId);
 
+    // Find all comments by a user (can also be found via PostableRepository)
+    List<Comment> findByUserId(Long userId);
 }
