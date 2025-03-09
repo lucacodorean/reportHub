@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="users", schema="reporthub")
 @ToString
@@ -42,6 +45,10 @@ public class User implements IModel {
 
     @Column(name = "model_key")
     private String modelKey = generateKey(this);
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Postable> userPosts;
 
     public User(String username, String email, String password, String phoneNumber) {
         this.username = username;
