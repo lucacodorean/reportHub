@@ -10,4 +10,5 @@ public class UserUpdateRequest {
     @Nullable private Float score;
     @Nullable private String email;
     @Nullable private String password;
+    @Nullable private Boolean banned;
 }

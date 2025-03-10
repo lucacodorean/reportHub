@@ -2,12 +2,19 @@ package com.reporthub.controller.api.v1;
 
 import com.reporthub.dto.UserDTO;
 import com.reporthub.entity.User;
+import com.reporthub.entity.auth.Authenticated;
 import com.reporthub.request.UserUpdateRequest;
+import com.reporthub.service.IAuthorizationService;
 import com.reporthub.service.IUserService;
 import com.reporthub.singleton.ServiceSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +26,9 @@ public class UserController {
 
     @Autowired
     private final IUserService userService = ServiceSingleton.getUserService();
+
+    @Autowired
+    public final IAuthorizationService authorizationService = ServiceSingleton.getAuthorizationService();
 
     @GetMapping("/")
     public ResponseEntity<List<UserDTO>> index() {
@@ -37,6 +47,7 @@ public class UserController {
     }
 
     @PatchMapping("/{key}")
+    @PreAuthorize("@authorizationService.canEditUser(authentication.principal.id, #key)")
     public ResponseEntity<UserDTO> update(@PathVariable String key, @RequestBody UserUpdateRequest request) {
         User user = userService.findByKey(key);
         if(user == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -45,6 +56,7 @@ public class UserController {
         if(request.getPhoneNumber() != null)    user.setPhoneNumber(request.getPhoneNumber());
         if(request.getEmail() != null)          user.setEmail(request.getEmail());
         if(request.getScore() != null)          user.setScore(request.getScore());
+        if(request.getBanned() != null && user.getIsBanned() != request.getBanned()) user.setIsBanned(request.getBanned());
         if(request.getPassword() != null) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
             user.setPassword(encoder.encode(request.getPassword()));
@@ -56,6 +68,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{key}")
+    @PreAuthorize("@authorizationService.canDeleteUser(authentication.principal.id, #key)")
     public ResponseEntity<Boolean> delete(@PathVariable String key) {
         Boolean status = userService.delete(userService.findByKey(key));
         return ResponseEntity.status(HttpStatus.OK).body(status);
