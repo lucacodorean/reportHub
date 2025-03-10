@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -37,11 +36,11 @@ public abstract class Postable implements IModel {
     private User user;
 
     @Column(name = "post_key")
-    private String modelKey = generateKey(this);
+    private String post_key = generateKey(this);
 
     @Column(name="like_count")
-    private Long likeCount;
+    private Long like_count;
 
     @Column(name="dislike_count")
-    private Long dislikeCount;
+    private Long dislike_count;
 }
