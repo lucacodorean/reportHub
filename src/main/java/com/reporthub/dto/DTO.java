@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DTO {
+public abstract class DTO {
 
     @JsonProperty("id")             public String key;
     @JsonProperty("type" )          public String type;
