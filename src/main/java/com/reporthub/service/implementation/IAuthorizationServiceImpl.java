@@ -24,12 +24,12 @@ public class IAuthorizationServiceImpl implements IAuthorizationService {
         Optional<User> user = userRepository.findByKey(target);
 
         if (user.isPresent() && user.get().getIsBanned()) return isAdmin(authenticatedId);
-        return user.isPresent() && (user.get().getId().equals(authenticatedId) || isAdmin(authenticatedId));
+        return (user.isPresent() && user.get().getId().equals(authenticatedId)) || isAdmin(authenticatedId);
     }
 
     @Override
     public boolean canDeleteUser(Long authenticatedId, String target) {
         Optional<User> user = userRepository.findByKey(target);
-        return user.isPresent() && (user.get().getId().equals(authenticatedId) || isAdmin(authenticatedId));
+        return (user.isPresent() && user.get().getId().equals(authenticatedId)) || isAdmin(authenticatedId);
     }
 }

@@ -2,7 +2,6 @@ package com.reporthub.controller.api.v1;
 
 import com.reporthub.dto.UserDTO;
 import com.reporthub.entity.User;
-import com.reporthub.entity.auth.Authenticated;
 import com.reporthub.request.UserUpdateRequest;
 import com.reporthub.service.IAuthorizationService;
 import com.reporthub.service.IUserService;
@@ -11,10 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
