@@ -1,4 +1,4 @@
-package com.reporthub.request;
+package com.reporthub.request.api.v1;
 
 import jakarta.annotation.Nullable;
 import lombok.Getter;

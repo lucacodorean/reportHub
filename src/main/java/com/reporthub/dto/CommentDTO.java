@@ -1,15 +1,19 @@
 package com.reporthub.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reporthub.entity.Comment;
 import com.reporthub.config.AppConfig;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Data
 public class CommentDTO extends PostableDTO {
 
-    private ReportDTO reportDTO;
+    @JsonIgnore @NonNull private ReportDTO reportDTO;
 
     public CommentDTO(Comment comment) {
         super(comment, "comments");
@@ -18,9 +22,9 @@ public class CommentDTO extends PostableDTO {
             this.reportDTO = new ReportDTO(comment.getReport());
         }
 
-        super.attributes.put("reportKey", this.getReportDTO().getPostKey());
+        super.relationships.put("report", this.getReportDTO());
 
-        super.links.put("this",    AppConfig.getAPILink() + "/comments/" + this);
+        super.links.put("this",    AppConfig.getAPILink() + "/comments/" + this.key);
         super.links.put("parent",  AppConfig.getAPILink() + "/comments/");
     }
 }

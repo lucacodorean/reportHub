@@ -3,6 +3,7 @@ package com.reporthub.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reporthub.config.AppConfig;
 import com.reporthub.entity.Postable;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Data
 public abstract class PostableDTO extends DTO {
 
     @JsonIgnore @NonNull    private String content;
@@ -40,11 +42,7 @@ public abstract class PostableDTO extends DTO {
         super.attributes.put("updatedAt", this.getUpdatedAt());
         super.attributes.put("likeCount", this.getLikeCount());
         super.attributes.put("dislikeCount", this.getDislikeCount());
-        super.attributes.put("userDto", this.getUserDTO());
 
-        super.relationships.put("userDto", this.getUserDTO());
-
-        super.links.put("this", AppConfig.getAPILink() + "/posts/" + this.getPostKey());
-        super.links.put("parent", AppConfig.getAPILink() + "/posts/");
+        super.relationships.put("user", this.getUserDTO());
     }
 }

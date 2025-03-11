@@ -2,7 +2,6 @@ package com.reporthub.repository;
 
 import com.reporthub.entity.Report;
 import com.reporthub.entity.Report.Status;
-import com.reporthub.repository.IPostableRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
