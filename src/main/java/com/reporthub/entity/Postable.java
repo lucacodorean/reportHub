@@ -43,4 +43,13 @@ public abstract class Postable implements IModel {
 
     @Column(name="dislike_count")
     private Long dislike_count;
+
+    public Postable(String content, User user) {
+        this.content = content;
+        this.created_at = LocalDateTime.now();
+        this.user = user;
+        this.post_key = generateKey(this);
+        this.like_count = 0L;
+        this.dislike_count = 0L;
+    }
 }

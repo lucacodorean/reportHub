@@ -19,7 +19,7 @@ public abstract class PostableDTO extends DTO {
     @JsonIgnore @NonNull    private String postKey;
     @JsonIgnore             private Long likeCount;
     @JsonIgnore             private Long dislikeCount;
-    @JsonIgnore             private String userKey;
+    @JsonIgnore             private UserDTO userDTO;
 
     public PostableDTO(Postable postable, String type) {
         super(type);
@@ -31,7 +31,7 @@ public abstract class PostableDTO extends DTO {
             this.postKey = postable.getPost_key();
             this.likeCount = postable.getLike_count();
             this.dislikeCount = postable.getDislike_count();
-            this.userKey = postable.getUser().getModelKey();
+            this.userDTO = new UserDTO(postable.getUser());
         }
 
         super.key = this.postKey;
@@ -40,9 +40,11 @@ public abstract class PostableDTO extends DTO {
         super.attributes.put("updatedAt", this.getUpdatedAt());
         super.attributes.put("likeCount", this.getLikeCount());
         super.attributes.put("dislikeCount", this.getDislikeCount());
-        super.attributes.put("userKey", this.getUserKey());
+        super.attributes.put("userDto", this.getUserDTO());
+
+        super.relationships.put("userDto", this.getUserDTO());
 
         super.links.put("this", AppConfig.getAPILink() + "/posts/" + this.getPostKey());
-        super.links.put("user", AppConfig.getAPILink() + "/users/" + this.getUserKey());
+        super.links.put("parent", AppConfig.getAPILink() + "/posts/");
     }
 }
