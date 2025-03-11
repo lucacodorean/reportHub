@@ -1,15 +1,19 @@
 package com.reporthub.controller.api.v1;
 
 import com.reporthub.dto.ReportDTO;
+import com.reporthub.dto.TagDTO;
 import com.reporthub.entity.Report;
+import com.reporthub.entity.Tag;
 import com.reporthub.entity.User;
 import com.reporthub.service.IReportService;
+import com.reporthub.service.IUserService;
 import com.reporthub.singleton.ServiceSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -22,16 +26,19 @@ public class ReportController {
     // Get all
     @GetMapping("/")
     public ResponseEntity<List<ReportDTO>> index() {
-        System.out.println("Hello!!!!");
         return ResponseEntity.status(HttpStatus.OK).body(
                 reportService.findAll().stream().map(ReportDTO::new).toList()
         );
     }
 
-    //TODO: implement adding reports
-    // @PostMapping("/")
-    //public ResponseEntity<ReportDTO> addReport(@RequestBody ReportDTO reportDTO) {
-    //}
+//    @PostMapping("/")
+//    public ResponseEntity<?> addReport(@RequestBody ReportDTO reportDTO) {
+//        User reportingUser = userService.findByKey(reportDTO.getUserDTO().getModelKey());
+//        Report report = new Report(reportDTO.getContent(), reportingUser, reportDTO.getTitle(), reportDTO.getTags());
+//            return ResponseEntity.status(HttpStatus.CREATED).body(
+//                reportService.save(report)
+//        );
+//    }
 
     // Get by key
     @GetMapping("/{postKey}")
@@ -43,8 +50,8 @@ public class ReportController {
 
     // DeleteKey
     @DeleteMapping("delete/{postKey}")
-    public ResponseEntity<Void> delete(@PathVariable String postKey) {
+    public ResponseEntity<ReportDTO> delete(@PathVariable String postKey) {
         reportService.delete(reportService.findByKey(postKey));
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

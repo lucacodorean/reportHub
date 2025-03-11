@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import com.reporthub.entity.Tag;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -37,4 +38,10 @@ public class Report extends Postable {
     )
     private List<Tag> tags;
 
+    public Report(String content, User user, String title, List<Tag> tags) {
+        super(content, user);
+        this.title = title;
+        this.status = Status.RECEIVED;
+        this.tags = tags;
+    }
 }

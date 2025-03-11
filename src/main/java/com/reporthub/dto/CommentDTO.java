@@ -9,17 +9,18 @@ import lombok.Setter;
 @Setter
 public class CommentDTO extends PostableDTO {
 
-    private String reportKey;
+    private ReportDTO reportDTO;
 
     public CommentDTO(Comment comment) {
         super(comment, "comments");
 
         if (comment != null) {
-            this.reportKey = comment.getReport().getPost_key();
+            this.reportDTO = new ReportDTO(comment.getReport());
         }
 
-        super.attributes.put("reportKey", this.getReportKey());
+        super.attributes.put("reportKey", this.getReportDTO().getPostKey());
 
-        super.links.put("report", AppConfig.getAPILink() + "/reports/" + this.getReportKey());
+        super.links.put("this",    AppConfig.getAPILink() + "/comments/" + this);
+        super.links.put("parent",  AppConfig.getAPILink() + "/comments/");
     }
 }

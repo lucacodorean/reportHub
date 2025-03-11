@@ -28,9 +28,7 @@ public class IReportServiceImpl implements IReportService {
 
     public List<Report> findAll() { return reportRepository.findAll(); }
 
-    public 
-
-    boolean delete(Report entity) {
+    public boolean delete(Report entity) {
         if(!reportRepository.existsById(entity.getId())) return false;
 
         reportRepository.delete(entity);
