@@ -2,8 +2,7 @@ package com.reporthub.controller.api.v1;
 
 import com.reporthub.dto.UserDTO;
 import com.reporthub.entity.User;
-import com.reporthub.request.UserUpdateRequest;
-import com.reporthub.service.IAuthorizationService;
+import com.reporthub.request.api.v1.UserUpdateRequest;
 import com.reporthub.service.IUserService;
 import com.reporthub.singleton.ServiceSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +20,6 @@ public class UserController {
 
     @Autowired
     private final IUserService userService = ServiceSingleton.getUserService();
-
-    @Autowired
-    public final IAuthorizationService authorizationService = ServiceSingleton.getAuthorizationService();
 
     @GetMapping("/")
     public ResponseEntity<List<UserDTO>> index() {

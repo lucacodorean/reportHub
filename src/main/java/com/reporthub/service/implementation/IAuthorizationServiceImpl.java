@@ -32,4 +32,15 @@ public class IAuthorizationServiceImpl implements IAuthorizationService {
         Optional<User> user = userRepository.findByKey(target);
         return (user.isPresent() && user.get().getId().equals(authenticatedId)) || isAdmin(authenticatedId);
     }
+
+    @Override
+    public boolean canEditReport(Long authenticatedId, String target) {
+        Optional<User> user = userRepository.findByKey(target);
+        return (user.isPresent() && user.get().getId().equals(authenticatedId)) || isAdmin(authenticatedId);
+    }
+
+    @Override
+    public boolean isConnected(Long authenticatedId) {
+        return authenticatedId != null;
+    }
 }
