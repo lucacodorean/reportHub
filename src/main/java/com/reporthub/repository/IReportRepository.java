@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IReportRepository extends IPostableRepository<Report> {
@@ -21,6 +22,6 @@ public interface IReportRepository extends IPostableRepository<Report> {
     List<Report> findByTagName(@Param("tagName") String tagName);
 
     @Query("SELECT r FROM Report r WHERE r.post_key = :postKey")
-    Report findByPostKey(@Param("postKey") String postKey);
+    Optional<Report> findByPostKey(@Param("postKey") String postKey);
 
 }

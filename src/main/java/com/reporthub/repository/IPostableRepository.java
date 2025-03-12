@@ -22,5 +22,4 @@ public interface IPostableRepository<T extends Postable> extends JpaRepository<T
 
     @Query("SELECT p FROM #{#entityName} p WHERE p.user.id = :userId")
     List<T> findByUserId(@Param("userId") Long userId);
-
 }

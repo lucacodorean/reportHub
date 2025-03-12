@@ -1,13 +1,7 @@
 package com.reporthub.singleton;
 
-import com.reporthub.service.IReportService;
-import com.reporthub.service.IAuthorizationService;
-import com.reporthub.service.ITagService;
-import com.reporthub.service.IUserService;
-import com.reporthub.service.implementation.IReportServiceImpl;
-import com.reporthub.service.implementation.IAuthorizationServiceImpl;
-import com.reporthub.service.implementation.ITagServiceImpl;
-import com.reporthub.service.implementation.IUserServiceImpl;
+import com.reporthub.service.*;
+import com.reporthub.service.implementation.*;
 import lombok.Getter;
 
 public class ServiceSingleton {
@@ -24,12 +18,16 @@ public class ServiceSingleton {
     private static ITagService tagService;
 
     @Getter
+    private static ICommentService commentService;
+
+    @Getter
     private static IAuthorizationService authorizationService;
 
     static {
         userService = new IUserServiceImpl();
         reportService = new IReportServiceImpl();
         tagService = new ITagServiceImpl();
+        commentService = new ICommentServiceImpl();
         authorizationService = new IAuthorizationServiceImpl();
     }
 }

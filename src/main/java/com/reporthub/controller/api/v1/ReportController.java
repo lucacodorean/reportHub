@@ -67,7 +67,7 @@ public class ReportController {
     }
 
     @PatchMapping("/{key}")
-    @PreAuthorize("@authorizationService.canEditReport(authentication.principal.id, #key)")
+    @PreAuthorize("@authorizationService.canOperateReport(authentication.principal.id, #key)")
     public ResponseEntity<ReportDTO> update(@PathVariable String key, @RequestBody ReportUpdateRequest request) {
         Report report = reportService.findByKey(key);
         if(report == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -84,8 +84,8 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ReportDTO(reportService.save(report)));
     }
 
-    // DeleteKey
     @DeleteMapping("/{key}")
+    @PreAuthorize("@authorizationService.canOperateReport(authentication.principal.id, #key)")
     public ResponseEntity<ReportDTO> delete(@PathVariable String key) {
         reportService.delete(reportService.findByKey(key));
         return ResponseEntity.status(HttpStatus.OK).build();
