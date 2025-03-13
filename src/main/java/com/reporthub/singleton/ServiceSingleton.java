@@ -23,11 +23,15 @@ public class ServiceSingleton {
     @Getter
     private static IAuthorizationService authorizationService;
 
+    @Getter
+    private static IMailService mailService;
+
     static {
         userService = new IUserServiceImpl();
         reportService = new IReportServiceImpl();
         tagService = new ITagServiceImpl();
         commentService = new ICommentServiceImpl();
         authorizationService = new IAuthorizationServiceImpl();
+        mailService = new IMailServiceImpl();
     }
 }

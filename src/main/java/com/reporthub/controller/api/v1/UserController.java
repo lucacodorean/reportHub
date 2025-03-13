@@ -3,6 +3,7 @@ package com.reporthub.controller.api.v1;
 import com.reporthub.dto.UserDTO;
 import com.reporthub.entity.User;
 import com.reporthub.request.api.v1.UserUpdateRequest;
+import com.reporthub.service.IMailService;
 import com.reporthub.service.IUserService;
 import com.reporthub.singleton.ServiceSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class UserController {
 
     @Autowired
     private final IUserService userService = ServiceSingleton.getUserService();
+
+    @Autowired
+    private final IMailService mailService = ServiceSingleton.getMailService();
 
     @GetMapping("/")
     public ResponseEntity<List<UserDTO>> index() {
@@ -47,7 +51,18 @@ public class UserController {
         if(request.getPhoneNumber() != null)    user.setPhoneNumber(request.getPhoneNumber());
         if(request.getEmail() != null)          user.setEmail(request.getEmail());
         if(request.getScore() != null)          user.setScore(request.getScore());
-        if(request.getBanned() != null && user.getIsBanned() != request.getBanned()) user.setIsBanned(request.getBanned());
+        if(request.getBanned() != null && user.getIsBanned() != request.getBanned())  {
+            String stringBuilder = "Dear " + user.getUsername() +
+                ", \nWe're contacting you in regards of your reportHub account.\n\n" +
+                "Your access on the platform has been " +
+                (request.getBanned() ?
+                    "revoked due to the failure to respect community's policy. \nYou may need to contact community's administrators in order to re-gain access to your account.\n"
+                    : "authorized. You may log-in again on reportHub.\n") +
+                "\nKind regards,\nteam @reportHub";
+
+            mailService.sendMail(user.getEmail(), "reportHub - about your account", stringBuilder);
+            user.setIsBanned(request.getBanned());
+        }
         if(request.getPassword() != null) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
             user.setPassword(encoder.encode(request.getPassword()));
