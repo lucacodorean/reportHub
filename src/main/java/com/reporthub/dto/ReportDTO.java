@@ -2,24 +2,25 @@ package com.reporthub.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reporthub.config.AppConfig;
-import com.reporthub.dto.PostableDTO;
 import com.reporthub.entity.Report;
-import com.reporthub.entity.Tag;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @Setter
-@Data
 public class ReportDTO extends PostableDTO {
 
     @JsonIgnore @NonNull  private String title;
     @JsonIgnore @NonNull  private String status;
     @JsonIgnore @NonNull  private List<TagDTO> tags;
+    @JsonIgnore @NonNull  private Resource attachment;
 
     public ReportDTO(Report report) {
         super(report, "reports");
@@ -30,6 +31,12 @@ public class ReportDTO extends PostableDTO {
             this.title = report.getTitle();
             this.status = report.getStatus().name();
             this.tags = report.getTags().stream().map(TagDTO::new).collect(Collectors.toList());
+
+            if(report.getAttachment() != null) {
+                super.attributes.put("attachment",AppConfig.getAPIUrl() + "/" +
+                        report.getAttachment().replace("\\", "/")
+                );
+            }
         }
 
         super.attributes.put("content", super.getContent());

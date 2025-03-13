@@ -30,6 +30,9 @@ public class Report extends Postable {
     @Enumerated(EnumType.STRING)
     private Status status = Status.RECEIVED;
 
+    @Column(name = "attachment_path")
+    private String attachment;
+
     @ManyToMany
     @JoinTable(
             name = "report_tags",
@@ -43,5 +46,13 @@ public class Report extends Postable {
         this.title = title;
         this.status = Status.RECEIVED;
         this.tags = tags;
+    }
+
+    public Report(String content, User user, String title, List<Tag> tags, String attachmentPath) {
+        super(content, user);
+        this.title = title;
+        this.status = Status.RECEIVED;
+        this.tags = tags;
+        this.attachment = attachmentPath;
     }
 }
