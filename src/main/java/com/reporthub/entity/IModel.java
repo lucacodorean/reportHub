@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Random;
 
 public interface IModel {
-    public default String generateKey(Object classObject) {
+    default String generateKey(Object classObject) {
 
         int leftLimit = 48;
         int rightLimit = 122;

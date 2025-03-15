@@ -6,7 +6,6 @@ import com.reporthub.dto.auth.RegisterRequest;
 import com.reporthub.entity.User;
 import com.reporthub.service.IUserService;
 import com.reporthub.service.JwtService;
-import com.reporthub.singleton.ServiceSingleton;
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +23,7 @@ import java.util.Objects;
 public class AuthController {
 
     @Autowired
-    private final IUserService userService = ServiceSingleton.getUserService();
+    private IUserService userService;
     @Autowired
     private JwtService jwtService;
 

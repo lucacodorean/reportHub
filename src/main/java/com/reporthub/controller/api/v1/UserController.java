@@ -5,7 +5,6 @@ import com.reporthub.entity.User;
 import com.reporthub.request.api.v1.UserUpdateRequest;
 import com.reporthub.service.IMailService;
 import com.reporthub.service.IUserService;
-import com.reporthub.singleton.ServiceSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +18,9 @@ import java.util.List;
 @RequestMapping ("/api/v1/users")
 public class UserController {
 
-    @Autowired
-    private final IUserService userService = ServiceSingleton.getUserService();
+    @Autowired private IUserService userService;
 
-    @Autowired
-    private final IMailService mailService = ServiceSingleton.getMailService();
+    @Autowired private IMailService mailService;
 
     @GetMapping("/")
     public ResponseEntity<List<UserDTO>> index() {

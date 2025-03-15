@@ -8,7 +8,6 @@ import com.reporthub.request.api.v1.CommentUpdateRequest;
 import com.reporthub.service.ICommentService;
 import com.reporthub.service.IReportService;
 import com.reporthub.service.IUserService;
-import com.reporthub.singleton.ServiceSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +22,9 @@ import java.util.List;
 @RequestMapping("/api/v1/comments")
 public class CommentController {
 
-    @Autowired private final ICommentService commentService = ServiceSingleton.getCommentService();
-    @Autowired private final IUserService userService = ServiceSingleton.getUserService();
-    @Autowired private final IReportService reportService = ServiceSingleton.getReportService();
+    @Autowired private  ICommentService commentService;
+    @Autowired private  IUserService userService;
+    @Autowired private  IReportService reportService;
 
     @GetMapping("/")
     public ResponseEntity<List<CommentDTO>> index() {
