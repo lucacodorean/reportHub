@@ -3,12 +3,17 @@ package com.reporthub.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reporthub.config.AppConfig;
 import com.reporthub.entity.Postable;
+import com.reporthub.entity.PostableRating;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -22,6 +27,7 @@ public abstract class PostableDTO extends DTO {
     @JsonIgnore             private Long likeCount;
     @JsonIgnore             private Long dislikeCount;
     @JsonIgnore             private UserDTO userDTO;
+    @JsonIgnore             private Set<Object> ratings;
 
     public PostableDTO(Postable postable, String type) {
         super(type);
@@ -34,6 +40,15 @@ public abstract class PostableDTO extends DTO {
             this.likeCount = postable.getLike_count();
             this.dislikeCount = postable.getDislike_count();
             this.userDTO = new UserDTO(postable.getUser());
+            this.ratings = new HashSet<>();
+
+            postable.getRatings().forEach(item -> {
+                Map<String, Object> structure = new HashMap<>();
+                structure.put("user_id",     item.getUser().getModelKey());
+                structure.put("status",      item.getStatus());
+
+                this.ratings.add(structure);
+            });
         }
 
         super.key = this.postKey;
@@ -44,5 +59,6 @@ public abstract class PostableDTO extends DTO {
         super.attributes.put("dislikeCount", this.getDislikeCount());
 
         super.relationships.put("user", this.getUserDTO());
+        super.relationships.put("ratings", this.getRatings());
     }
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="users", schema="reporthub")
@@ -48,6 +49,9 @@ public class User implements IModel {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Postable> userPosts;
+
+    @OneToMany(mappedBy = "user")
+    private Set<PostableRating> ratings;
 
     public User(String username, String email, String password, String phoneNumber) {
         this.username = username;
