@@ -1,9 +1,7 @@
 package com.reporthub.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.reporthub.config.AppConfig;
 import com.reporthub.entity.Postable;
-import com.reporthub.entity.PostableRating;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
