@@ -9,7 +9,6 @@ import com.reporthub.request.api.v1.ReportUpdateRequest;
 import com.reporthub.service.IReportService;
 import com.reporthub.service.ITagService;
 import com.reporthub.service.IUserService;
-import com.reporthub.singleton.ServiceSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,14 +31,11 @@ import java.util.UUID;
 @RequestMapping("/api/v1/reports")
 public class ReportController {
 
-    @Autowired
-    private final IReportService reportService = ServiceSingleton.getReportService();
+    @Autowired private IReportService reportService;
 
-    @Autowired
-    private final ITagService tagService = ServiceSingleton.getTagService();
+    @Autowired private ITagService tagService;
 
-    @Autowired
-    private final IUserService userService = ServiceSingleton.getUserService();
+    @Autowired private IUserService userService;
 
     // Get all
     @GetMapping("/")

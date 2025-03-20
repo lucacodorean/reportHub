@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -37,6 +38,9 @@ public abstract class Postable implements IModel {
 
     @Column(name = "post_key")
     private String post_key = generateKey(this);
+
+    @OneToMany(mappedBy = "postable")
+    private Set<PostableRating> ratings;
 
     @Column(name="like_count")
     private Long like_count;

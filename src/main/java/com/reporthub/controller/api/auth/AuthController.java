@@ -6,7 +6,6 @@ import com.reporthub.dto.auth.RegisterRequest;
 import com.reporthub.entity.User;
 import com.reporthub.service.IUserService;
 import com.reporthub.service.JwtService;
-import com.reporthub.singleton.ServiceSingleton;
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +23,7 @@ import java.util.Objects;
 public class AuthController {
 
     @Autowired
-    private final IUserService userService = ServiceSingleton.getUserService();
+    private IUserService userService;
     @Autowired
     private JwtService jwtService;
 
@@ -60,21 +59,21 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
         UserDTO user = new UserDTO(userService.findByUsername(request.getUsername()));
+
+        if(user.getBanned()) {
+            Map<String, String> message = new HashMap<>();
+            message.put("message", "You're account has been banned. You may check your e-mail inbox for more information.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(message);
+        }
+
         String JWT = userService.verify(request.getUsername(), request.getPassword());
         if(Objects.equals(JWT, "Failed")) {
             Map<String, String> message = new HashMap<>();
             message.put("message", "User credentials are incorrect.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(message);
         }
 
         user.attributes.put("JWT", JWT);
         return ResponseEntity.status(HttpStatus.OK).body(user);
-    }
-
-    @GetMapping("/connected")
-    public ResponseEntity<UserDTO> getLoggedInUser(@RequestHeader("Authorization") String authHeader) {
-        User user = userService.retrieveLoggedUser(authHeader);
-        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        return ResponseEntity.ok(new UserDTO(user));
     }
 }

@@ -22,4 +22,7 @@ public interface IPostableRepository<T extends Postable> extends JpaRepository<T
 
     @Query("SELECT p FROM #{#entityName} p WHERE p.user.id = :userId")
     List<T> findByUserId(@Param("userId") Long userId);
+
+    @Query(value = "INSERT INTO PostableRating VALUES (:userId, :postableId, :status)", nativeQuery = true)
+    void ratePostable(@Param("userId") Long userId, @Param("postableId") Long postableId, @Param("status") Boolean status);
 }

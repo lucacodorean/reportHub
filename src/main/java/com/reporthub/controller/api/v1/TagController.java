@@ -4,7 +4,6 @@ import com.reporthub.dto.TagDTO;
 import com.reporthub.entity.Tag;
 import com.reporthub.request.api.v1.TagStoreRequest;
 import com.reporthub.service.ITagService;
-import com.reporthub.singleton.ServiceSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +17,7 @@ import java.util.List;
 public class TagController {
 
 
-    @Autowired
-    private final ITagService tagService = ServiceSingleton.getTagService();
+    @Autowired private ITagService tagService;
 
     @GetMapping("/")
     @PreAuthorize("@authorizationService.isConnected(authentication.principal.id)")

@@ -1,6 +1,7 @@
 package com.reporthub.service.implementation;
 
 import com.reporthub.entity.Comment;
+import com.reporthub.entity.Postable;
 import com.reporthub.entity.Report;
 import com.reporthub.entity.User;
 import com.reporthub.repository.ICommentRepository;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service("authorizationService")
 public class IAuthorizationServiceImpl implements IAuthorizationService {
@@ -53,5 +55,16 @@ public class IAuthorizationServiceImpl implements IAuthorizationService {
     @Override
     public boolean isConnected(Long authenticatedId) {
         return authenticatedId != null;
+    }
+
+    @Override
+    public boolean canAppreciatePost(Long authenticatedId, String target) {
+        if(target.contains("com_")) {
+            Optional<Comment> comment = commentRepository.findByKey(target);
+            return (comment.isPresent() && !comment.get().getUser().getId().equals(authenticatedId));
+        }
+
+        Optional<Report> report = reportRepository.findByPostKey(target);
+        return (report.isPresent() && !report.get().getUser().getId().equals(authenticatedId));
     }
 }

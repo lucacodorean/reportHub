@@ -61,12 +61,4 @@ public class IUserServiceImpl implements IUserService {
 
         return jwtService.generateToken(username);
     }
-
-    @Override
-    public User retrieveLoggedUser(String authHeader) {
-        String tokenString = authHeader.replace("Bearer ", "");
-        String username = jwtService.extractUsername(tokenString);
-
-        return userRepository.findByUsername(username);
-    }
 }

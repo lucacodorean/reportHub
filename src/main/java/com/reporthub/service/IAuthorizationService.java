@@ -7,4 +7,5 @@ public interface IAuthorizationService {
     boolean canOperateReport(Long authenticatedId, String target);
     boolean canOperateComment(Long authenticatedId, String target);
     boolean isConnected(Long authenticatedId);
+    boolean canAppreciatePost(Long authenticatedId, String target);
 }
