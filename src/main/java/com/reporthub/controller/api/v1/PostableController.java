@@ -5,7 +5,9 @@ import com.reporthub.entity.auth.Authenticated;
 import com.reporthub.service.ICommentService;
 import com.reporthub.service.IPostableRatingService;
 import com.reporthub.service.IReportService;
+import exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,19 +34,21 @@ public class PostableController {
     @PostMapping("/{key}/appreciate")
     @PreAuthorize("@authorizationService.canAppreciatePost(authentication.principal.id, #key)")
     public ResponseEntity<?> appreciate(@PathVariable String key, @RequestParam(value = "rating") Rating rating) {
-        Postable postable;
-        if(key.contains("com_")) postable = commentService.findByKey(key);
-        else postable = reportService.findByKey(key);
+        try {
+            Postable postable;
+            if(key.contains("com_")) postable = commentService.findByKey(key);
+            else postable = reportService.findByKey(key);
 
-        Boolean status = false;
-        if(rating == Rating.NULL) status = null;
-        if(rating == Rating.LIKE) status = true;
-        if(rating == Rating.DISLIKE) status = false;
+            Boolean status = false;
+            if(rating == Rating.NULL) status = null;
+            if(rating == Rating.LIKE) status = true;
+            if(rating == Rating.DISLIKE) status = false;
 
-        Long userId = ((Authenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+            Long userId = ((Authenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
 
-        Map<String, Boolean> message = new HashMap<>();
-        message.put("status", postableRatingService.ratePostable(userId, postable, status));
-        return ResponseEntity.ok(message);
+            Map<String, Boolean> message = new HashMap<>();
+            message.put("status", postableRatingService.ratePostable(userId, postable, status));
+            return ResponseEntity.ok(message);
+        } catch (NotFoundException ex) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); }
     }
 }

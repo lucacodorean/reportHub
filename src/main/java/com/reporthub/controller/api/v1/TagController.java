@@ -4,6 +4,7 @@ import com.reporthub.dto.TagDTO;
 import com.reporthub.entity.Tag;
 import com.reporthub.request.api.v1.TagStoreRequest;
 import com.reporthub.service.ITagService;
+import exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,9 @@ public class TagController {
 
     @GetMapping("/{key}")
     public ResponseEntity<TagDTO> get(@PathVariable String key) {
-        return ResponseEntity.status(HttpStatus.OK).body(new TagDTO(tagService.findByKey(key)));
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(new TagDTO(tagService.findByKey(key)));
+        } catch (NotFoundException ex) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); }
     }
 
     @PostMapping("/")
@@ -43,7 +46,9 @@ public class TagController {
     @DeleteMapping("/{key}")
     @PreAuthorize("@authorizationService.isAdmin(authentication.principal.id)")
     public ResponseEntity<Boolean> delete(@PathVariable String key) {
-        Boolean status = tagService.delete(tagService.findByKey(key));
-        return ResponseEntity.status(HttpStatus.OK).body(status);
+        try {
+            Boolean status = tagService.delete(tagService.findByKey(key));
+            return ResponseEntity.status(HttpStatus.OK).body(status);
+        } catch (NotFoundException ex) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); }
     }
 }

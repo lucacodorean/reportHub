@@ -8,6 +8,7 @@ import com.reporthub.request.api.v1.CommentUpdateRequest;
 import com.reporthub.service.ICommentService;
 import com.reporthub.service.IReportService;
 import com.reporthub.service.IUserService;
+import exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,37 +36,44 @@ public class CommentController {
 
     @GetMapping("/{key}")
     public ResponseEntity<CommentDTO> get(@PathVariable String key) {
-
-        CommentDTO temp = new CommentDTO(commentService.findByKey(key));
-        if(temp.key == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.status(HttpStatus.OK).body(temp);
+        try {
+            CommentDTO temp = new CommentDTO(commentService.findByKey(key));
+            if(temp.key == null) return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.OK).body(temp);
+        } catch (NotFoundException e) { return ResponseEntity.notFound().build(); }
     }
 
     @PostMapping("/")
     @PreAuthorize("@authorizationService.isConnected(authentication.principal.id)")
     public ResponseEntity<CommentDTO> create(@RequestBody CommentStoreRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CommentDTO(commentService.save(new Comment(
-            request.getContent(),
-            userService.findById(((Authenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()),
-            reportService.findByKey(request.getReportId())
-        ))));
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(new CommentDTO(commentService.save(new Comment(
+                    request.getContent(),
+                    userService.findById(((Authenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()),
+                    reportService.findByKey(request.getReportId())
+            ))));
+        } catch (NotFoundException e) { return ResponseEntity.notFound().build(); }
     }
 
 
     @PatchMapping("/{key}")
     @PreAuthorize("@authorizationService.canOperateComment(authentication.principal.id, #key)")
     public ResponseEntity<CommentDTO> update(@PathVariable String key, @RequestBody CommentUpdateRequest request) {
-        Comment comment = commentService.findByKey(key);
-        if(request.getContent() != null) comment.setContent(request.getContent());
+        try {
+            Comment comment = commentService.findByKey(key);
+            if(request.getContent() != null) comment.setContent(request.getContent());
 
-        comment.setUpdated_at(LocalDateTime.now());
-        return ResponseEntity.status(HttpStatus.OK).body(new CommentDTO(commentService.save(comment)));
+            comment.setUpdated_at(LocalDateTime.now());
+            return ResponseEntity.status(HttpStatus.OK).body(new CommentDTO(commentService.save(comment)));
+        } catch (NotFoundException e) { return ResponseEntity.notFound().build(); }
     }
 
     @DeleteMapping("/{key}")
     @PreAuthorize("@authorizationService.canOperateComment(authentication.principal.id, #key)")
     public ResponseEntity<?> delete(@PathVariable String key) {
-        commentService.delete(commentService.findByKey(key));
-        return ResponseEntity.status(HttpStatus.OK).build();
+        try {
+            commentService.delete(commentService.findByKey(key));
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (NotFoundException e) { return ResponseEntity.notFound().build(); }
     }
 }

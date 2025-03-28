@@ -9,6 +9,7 @@ import com.reporthub.request.api.v1.ReportUpdateRequest;
 import com.reporthub.service.IReportService;
 import com.reporthub.service.ITagService;
 import com.reporthub.service.IUserService;
+import exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,36 +49,51 @@ public class ReportController {
     // Get by key
     @GetMapping("/{postKey}")
     public ResponseEntity<ReportDTO> get(@PathVariable String postKey) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ReportDTO(reportService.findByKey(postKey))
-        );
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ReportDTO(reportService.findByKey(postKey))
+            );
+        } catch (NotFoundException ex) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); }
     }
 
     @PostMapping("/")
     @PreAuthorize("@authorizationService.isConnected(authentication.principal.id)")
     public ResponseEntity<ReportDTO> create(@RequestBody ReportStoreRequest request) {
-        Report report = new Report();
-        report.setStatus(request.getStatus());
-        report.setTitle(request.getTitle());
-        report.setContent(request.getContent());
-        report.setDislike_count(0L);
-        report.setLike_count(0L);
+        try {
+            Report report = new Report();
+            report.setStatus(request.getStatus());
+            report.setTitle(request.getTitle());
+            report.setContent(request.getContent());
+            report.setDislike_count(0L);
+            report.setLike_count(0L);
 
-        report.setUser(userService.findById(
-                ((Authenticated)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()
-        ));
+            report.setUser(userService.findById(
+                    ((Authenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()
+            ));
 
-        report.setTags(request.getTags().stream().map(tagService::findByKey).toList());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ReportDTO(reportService.save(report)));
+            report.setTags(
+                request.getTags().stream()
+                    .map(tag -> {
+                        try { return tagService.findByKey(tag); }
+                        catch (NotFoundException e) { throw new RuntimeException(e); }
+                    })
+                    .filter(Objects::nonNull)
+                    .toList()
+            );
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ReportDTO(reportService.save(report)));
+        } catch (NotFoundException ex) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); }
     }
 
     @PostMapping("/{key}/attachment")
     @PreAuthorize("@authorizationService.canOperateReport(authentication.principal.id, #key)")
     public ResponseEntity<ReportDTO> attach(@PathVariable String key, @RequestPart("file") MultipartFile file) {
-        Report report = reportService.findByKey(key);
+        try {
+            Report report = reportService.findByKey(key);
 
-        if(report != null) report.setAttachment(this.retrieveFilePath(file));
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ReportDTO(reportService.save(report)));
+            if(report != null) report.setAttachment(this.retrieveFilePath(file));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ReportDTO(reportService.save(report)));
+        } catch (NotFoundException ex) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); }
     }
 
     private String retrieveFilePath(MultipartFile file) {
@@ -100,25 +116,39 @@ public class ReportController {
     @PatchMapping("/{key}")
     @PreAuthorize("@authorizationService.canOperateReport(authentication.principal.id, #key)")
     public ResponseEntity<ReportDTO> update(@PathVariable String key, @RequestBody ReportUpdateRequest request) {
-        Report report = reportService.findByKey(key);
-        if(report == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        try {
+            Report report = reportService.findByKey(key);
+            if(report == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
-        if(request.getStatus() != null)         report.setStatus(request.getStatus());
-        if(request.getTitle() != null)          report.setTitle(request.getTitle());
-        if(request.getContent() != null)        report.setContent(request.getContent());
-        if(request.getDislikeCount() != null)   report.setDislike_count(request.getDislikeCount());
-        if(request.getLikeCount() != null)      report.setLike_count(request.getLikeCount());
-        if(request.getTags() != null)
-            report.setTags(request.getTags().stream().map(tagService::findByKey).toList());
-
-        report.setUpdated_at(LocalDateTime.now());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ReportDTO(reportService.save(report)));
+            if(request.getStatus() != null)         report.setStatus(request.getStatus());
+            if(request.getTitle() != null)          report.setTitle(request.getTitle());
+            if(request.getContent() != null)        report.setContent(request.getContent());
+            if(request.getDislikeCount() != null)   report.setDislike_count(request.getDislikeCount());
+            if(request.getLikeCount() != null)      report.setLike_count(request.getLikeCount());
+            if(request.getTags() != null)
+                report.setTags(
+                    request.getTags().stream()
+                        .map(tag -> {
+                            try {return tagService.findByKey(tag); }
+                            catch (NotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .filter(Objects::nonNull)
+                        .toList()
+                );
+            
+            report.setUpdated_at(LocalDateTime.now());
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ReportDTO(reportService.save(report)));
+        } catch (NotFoundException ex) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); }
     }
 
     @DeleteMapping("/{key}")
     @PreAuthorize("@authorizationService.canOperateReport(authentication.principal.id, #key)")
     public ResponseEntity<ReportDTO> delete(@PathVariable String key) {
-        reportService.delete(reportService.findByKey(key));
-        return ResponseEntity.status(HttpStatus.OK).build();
+        try {
+            reportService.delete(reportService.findByKey(key));
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (NotFoundException ex) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); }
     }
 }
