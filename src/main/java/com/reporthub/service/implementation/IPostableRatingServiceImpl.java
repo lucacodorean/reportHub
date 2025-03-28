@@ -1,10 +1,12 @@
 package com.reporthub.service.implementation;
 
 import com.reporthub.entity.*;
+import com.reporthub.entity.auth.Authenticated;
 import com.reporthub.repository.IPostableRatingRepository;
 import com.reporthub.repository.IUserRepository;
 import com.reporthub.service.IPostableRatingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,15 +16,20 @@ public class IPostableRatingServiceImpl implements IPostableRatingService {
 
     @Autowired private IPostableRatingRepository postableRatingRepository;
 
-    private void updateUserScore(User user, Postable postable, Boolean status) {
+    private void updateUserScore(Postable postable, Boolean status) {
         User owner = postable.getUser();
         if(postable instanceof Comment) {
+            userRepository.findById(
+                ((Authenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()
+            ).ifPresent(auth -> {
+                auth.setScore(auth.getScore() + (status ? 0.0f : -1.5f));
+                userRepository.save(auth);
+            });
+
             owner.setScore(postable.getUser().getScore() + (status ? 5.0f : -2.5f));
-            user.setScore(user.getScore() + (status ? 0 : -1.5f));
-            return;
         }
 
-        owner.setScore(postable.getUser().getScore() + (status ? 2.5f : -1.5f));
+        else owner.setScore(postable.getUser().getScore() + (status ? 2.5f : -1.5f));
         userRepository.save(owner);
     }
 
@@ -47,9 +54,8 @@ public class IPostableRatingServiceImpl implements IPostableRatingService {
             postable.getRatings().stream().filter(r ->  Boolean.FALSE.equals(r.getStatus())).count()
         );
 
-        this.updateUserScore(user, postable, status);
+        this.updateUserScore(postable, status);
         userRepository.save(user);
-
         return returnStatus;
     }
 }
