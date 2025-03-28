@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -55,5 +56,10 @@ public abstract class Postable implements IModel {
         this.post_key = generateKey(this);
         this.like_count = 0L;
         this.dislike_count = 0L;
+    }
+
+    public Set<PostableRating> getRatings() {
+        if(ratings == null) return new HashSet<>();
+        return ratings;
     }
 }

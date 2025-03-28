@@ -35,9 +35,10 @@ public class CommentController {
 
     @GetMapping("/{key}")
     public ResponseEntity<CommentDTO> get(@PathVariable String key) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new CommentDTO(commentService.findByKey(key))
-        );
+
+        CommentDTO temp = new CommentDTO(commentService.findByKey(key));
+        if(temp.key == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.OK).body(temp);
     }
 
     @PostMapping("/")
