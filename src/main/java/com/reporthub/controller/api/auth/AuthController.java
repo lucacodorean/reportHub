@@ -1,15 +1,21 @@
 package com.reporthub.controller.api.auth;
 
+import com.reporthub.config.AppConfig;
 import com.reporthub.dto.UserDTO;
 import com.reporthub.dto.auth.LoginRequest;
 import com.reporthub.dto.auth.RegisterRequest;
 import com.reporthub.entity.User;
 import com.reporthub.service.IUserService;
 import com.reporthub.service.JwtService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +33,21 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
 
+    @Value("${app.api_url}")
+    private String API_URL;
+
+    private Cookie generateCookie(String JWT, String path) {
+        Cookie cookie = new Cookie("JWT", JWT);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath(AppConfig.getAPILink() + path);
+        cookie.setMaxAge(60*60*600);
+        return cookie;
+    }
+
     @ExceptionHandler({SQLException.class, JDBCException.class})
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request)  {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request, HttpServletResponse response)  {
         Map<String, String> message = new HashMap<>();
 
         if(userService.findByEmail(request.getEmail()) != null) {
@@ -46,7 +64,10 @@ public class AuthController {
                 )
             );
 
-            loggedUser.attributes.put("JWT", userService.verify(loggedUser.getUsername(), request.getPassword()));
+            String JWT = userService.verify(loggedUser.getUsername(), request.getPassword());
+            loggedUser.attributes.put("JWT", JWT);
+            response.addCookie(this.generateCookie(JWT, "/auth/register"));
+
             return ResponseEntity.ok(loggedUser);
 
         } catch (Exception e) {
@@ -56,7 +77,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
 
         UserDTO user = new UserDTO(userService.findByUsername(request.getUsername()));
 
@@ -74,6 +95,26 @@ public class AuthController {
         }
 
         user.attributes.put("JWT", JWT);
+        response.addCookie(this.generateCookie(JWT, "/auth/login"));
+
         return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+
+    @PostMapping("/logout")
+    @PreAuthorize("@authorizationService.isConnected(authentication.principal.id)")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("JWT", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+
+
+        Map<String, String> message = new HashMap<>();
+        message.put("message", "User has been logged out.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(message);
     }
 }
