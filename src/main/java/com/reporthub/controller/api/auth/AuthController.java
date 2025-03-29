@@ -8,7 +8,6 @@ import com.reporthub.entity.User;
 import com.reporthub.service.IUserService;
 import com.reporthub.service.JwtService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,16 +80,16 @@ public class AuthController {
 
         UserDTO user = new UserDTO(userService.findByUsername(request.getUsername()));
 
-        if(user.getBanned()) {
-            Map<String, String> message = new HashMap<>();
-            message.put("message", "You're account has been banned. You may check your e-mail inbox for more information.");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(message);
-        }
-
         String JWT = userService.verify(request.getUsername(), request.getPassword());
         if(Objects.equals(JWT, "Failed")) {
             Map<String, String> message = new HashMap<>();
             message.put("message", "User credentials are incorrect.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(message);
+        }
+
+        if(user.getBanned()) {
+            Map<String, String> message = new HashMap<>();
+            message.put("message", "You're account has been banned. You may check your e-mail inbox for more information.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(message);
         }
 
