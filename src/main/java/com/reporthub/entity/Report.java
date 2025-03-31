@@ -25,7 +25,7 @@ public class Report extends Postable {
     private String title;
 
     @Column(name = "status")
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private Status status = Status.RECEIVED;
 
     @Column(name = "attachment_path")
