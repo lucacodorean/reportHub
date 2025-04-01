@@ -15,6 +15,7 @@ public class UserDTO extends DTO {
     @JsonIgnore @NonNull    private Float score;
     @JsonIgnore @NonNull    private String modelKey;
     @JsonIgnore @NonNull    private Boolean banned;
+    @JsonIgnore @NonNull    private Boolean isAdmin;
 
     public UserDTO(User user) {
         super("users");
@@ -26,6 +27,7 @@ public class UserDTO extends DTO {
             this.score          = user.getScore();
             this.modelKey       = user.getModelKey();
             this.banned         = user.getIsBanned();
+            this.isAdmin        = user.getIsModerator();
         }
 
         super.key = this.modelKey;
@@ -34,6 +36,7 @@ public class UserDTO extends DTO {
         super.attributes.put("phoneNumber", this.getPhoneNumber());
         super.attributes.put("score", this.getScore());
         super.attributes.put("banned", this.getBanned());
+        super.attributes.put("isAdmin", this.isAdmin);
 
         super.links.put("this",    AppConfig.getAPILink() + "/users/" + this.getModelKey());
         super.links.put("parent",  AppConfig.getAPILink() + "/users/");
