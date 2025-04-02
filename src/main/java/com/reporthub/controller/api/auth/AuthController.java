@@ -11,7 +11,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,8 +31,6 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
 
-    @Value("${app.api_url}")
-    private String API_URL;
 
     private Cookie generateCookie(String JWT, String path) {
         Cookie cookie = new Cookie("JWT", JWT);
@@ -84,7 +81,7 @@ public class AuthController {
         if(Objects.equals(JWT, "Failed")) {
             Map<String, String> message = new HashMap<>();
             message.put("message", "User credentials are incorrect.");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(message);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(message);
         }
 
         if(user.getBanned()) {
