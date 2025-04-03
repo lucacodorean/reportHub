@@ -1,5 +1,6 @@
 package com.reporthub.entity;
 
+import com.reporthub.dto.CommentDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,6 +39,9 @@ public class Report extends Postable {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags;
+
+    @OneToMany(mappedBy = "report")
+    private List<Comment> comments;
 
     public Report(String content, User user, String title, List<Tag> tags) {
         super(content, user);

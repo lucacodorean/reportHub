@@ -2,10 +2,12 @@ package com.reporthub.controller.api.v1;
 
 import com.reporthub.config.AppConfig;
 import com.reporthub.dto.ReportDTO;
+import com.reporthub.entity.Comment;
 import com.reporthub.entity.Report;
 import com.reporthub.entity.auth.Authenticated;
 import com.reporthub.request.api.v1.ReportStoreRequest;
 import com.reporthub.request.api.v1.ReportUpdateRequest;
+import com.reporthub.service.ICommentService;
 import com.reporthub.service.IReportService;
 import com.reporthub.service.ITagService;
 import com.reporthub.service.IUserService;
@@ -27,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/reports")
@@ -135,9 +138,9 @@ public class ReportController {
                             }
                         })
                         .filter(Objects::nonNull)
-                        .toList()
+                        .collect(Collectors.toList())
                 );
-            
+
             report.setUpdated_at(LocalDateTime.now());
             return ResponseEntity.status(HttpStatus.CREATED).body(new ReportDTO(reportService.save(report)));
         } catch (NotFoundException ex) { return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); }
