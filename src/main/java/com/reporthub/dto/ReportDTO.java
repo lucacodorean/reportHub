@@ -31,8 +31,12 @@ public class ReportDTO extends PostableDTO {
             super.setUserDTO(new UserDTO(report.getUser()));
             this.title = report.getTitle();
             this.status = report.getStatus().name();
-            this.tags = report.getTags().stream().map(TagDTO::new).collect(Collectors.toList());
-            this.comments = report.getComments().stream().map(CommentDTO::new).collect(Collectors.toList());
+            if(report.getTags() != null) {
+                this.tags = report.getTags().stream().map(TagDTO::new).collect(Collectors.toList());
+            }
+            if(report.getComments() != null) {
+                this.comments = report.getComments().stream().map(CommentDTO::new).collect(Collectors.toList());
+            }
 
             if(report.getAttachment() != null) {
                 super.attributes.put("attachment",AppConfig.getAPIUrl() + "/" +
