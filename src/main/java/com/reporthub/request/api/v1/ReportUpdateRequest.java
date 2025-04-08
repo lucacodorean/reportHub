@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.List;
 
 @Getter
-public class ReportUpdateRequest {
+final public class ReportUpdateRequest implements IRequest {
     @Nullable private String title;
     @Nullable private Report.Status status;
     @Nullable private String content;

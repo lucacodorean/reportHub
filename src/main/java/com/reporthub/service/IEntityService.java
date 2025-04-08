@@ -1,6 +1,6 @@
 package com.reporthub.service;
 
-import exception.NotFoundException;
+import com.reporthub.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

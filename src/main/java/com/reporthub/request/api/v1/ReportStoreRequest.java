@@ -7,7 +7,7 @@ import lombok.NonNull;
 import java.util.List;
 
 @Getter
-public class ReportStoreRequest {
+final public class ReportStoreRequest implements IRequest {
     @NonNull private String title;
     @NonNull private Report.Status status;
     @NonNull private String content;

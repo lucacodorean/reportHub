@@ -1,19 +1,31 @@
 package com.reporthub.service.implementation;
 
+import com.reporthub.config.Rating;
 import com.reporthub.entity.*;
 import com.reporthub.entity.auth.Authenticated;
+import com.reporthub.exception.NotFoundException;
 import com.reporthub.repository.IPostableRatingRepository;
 import com.reporthub.repository.IUserRepository;
+import com.reporthub.service.ICommentService;
 import com.reporthub.service.IPostableRatingService;
+import com.reporthub.service.IReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Service
 public class IPostableRatingServiceImpl implements IPostableRatingService {
 
-    @Autowired private IUserRepository userRepository;
+    @Autowired private IReportService reportService;
+    @Autowired private ICommentService commentService;
 
+    @Autowired private IUserRepository userRepository;
     @Autowired private IPostableRatingRepository postableRatingRepository;
 
     private void updateUserScore(Postable postable, Boolean status) {
@@ -57,5 +69,25 @@ public class IPostableRatingServiceImpl implements IPostableRatingService {
         this.updateUserScore(postable, status);
         userRepository.save(user);
         return returnStatus;
+    }
+
+    public Map<String, String> appreciate(String key, Rating rating) {
+        Map<String, String> message = new HashMap<>();
+        try {
+            Postable postable;
+            if(key.contains("com_")) postable = commentService.findByKey(key);
+            else postable = reportService.findByKey(key);
+
+            Boolean status = false;
+            if(rating == Rating.NULL) status = null;
+            if(rating == Rating.LIKE) status = true;
+            if(rating == Rating.DISLIKE) status = false;
+
+            Long userId = ((Authenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+
+            message.put("status", this.ratePostable(userId, postable, status) ? "true" : "false");
+        } catch (NotFoundException ex) { message.put("message", ex.getMessage()); }
+
+        return message;
     }
 }

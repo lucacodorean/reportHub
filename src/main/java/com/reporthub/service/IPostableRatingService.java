@@ -1,8 +1,11 @@
 package com.reporthub.service;
 
+import com.reporthub.config.Rating;
 import com.reporthub.entity.Postable;
-import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 public interface IPostableRatingService {
     Boolean ratePostable(Long userId, Postable postable, Boolean status);
+    Map<String, String> appreciate(String key, Rating rating);
 }

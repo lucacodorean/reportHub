@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-public class CommentStoreRequest {
+final public class CommentStoreRequest implements IRequest {
     @NonNull private String content;
     @NonNull private String reportId;
 }

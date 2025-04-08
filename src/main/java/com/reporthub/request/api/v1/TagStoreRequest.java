@@ -4,6 +4,6 @@ import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-public class TagStoreRequest {
+final public class TagStoreRequest implements IRequest {
     @NonNull private String name;
 }
