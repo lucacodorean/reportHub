@@ -30,18 +30,20 @@ public class IPostableRatingServiceImpl implements IPostableRatingService {
 
     private void updateUserScore(Postable postable, Boolean status) {
         User owner = postable.getUser();
+        Boolean statusNull = status == null;
         if(postable instanceof Comment) {
             userRepository.findById(
                 ((Authenticated) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()
             ).ifPresent(auth -> {
-                auth.setScore(auth.getScore() + (status ? 0.0f : -1.5f));
+                auth.setScore(auth.getScore() + (!statusNull && status ? 0.0f : -1.5f));
                 userRepository.save(auth);
             });
 
-            owner.setScore(postable.getUser().getScore() + (status ? 5.0f : -2.5f));
+            owner.setScore(postable.getUser().getScore() + (!statusNull && status ? 5.0f : -2.5f));
+
         }
 
-        else owner.setScore(postable.getUser().getScore() + (status ? 2.5f : -1.5f));
+        else owner.setScore(postable.getUser().getScore() + (!statusNull && status ? 2.5f : -1.5f));
         userRepository.save(owner);
     }
 

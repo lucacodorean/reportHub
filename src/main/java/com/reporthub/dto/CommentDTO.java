@@ -18,6 +18,8 @@ public class CommentDTO extends PostableDTO {
     public CommentDTO(Comment comment) {
         super(comment, "comments");
 
+        super.relationships.put("user", this.getUserDTO());
+
         super.links.put("this",    AppConfig.getAPILink() + "/comments/" + this.key);
         super.links.put("parent",  AppConfig.getAPILink() + "/comments/");
     }

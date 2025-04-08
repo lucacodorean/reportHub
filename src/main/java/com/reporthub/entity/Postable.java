@@ -40,7 +40,7 @@ public abstract class Postable implements IModel {
     @Column(name = "post_key")
     private String post_key = generateKey(this);
 
-    @OneToMany(mappedBy = "postable")
+    @OneToMany(mappedBy = "postable", cascade = CascadeType.ALL)
     private Set<PostableRating> ratings;
 
     @Column(name="like_count")

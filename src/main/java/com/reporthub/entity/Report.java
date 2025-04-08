@@ -40,7 +40,7 @@ public class Report extends Postable {
     )
     private List<Tag> tags;
 
-    @OneToMany(mappedBy = "report")
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
     public Report(String content, User user, String title, List<Tag> tags) {
