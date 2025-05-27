@@ -1,19 +1,14 @@
 package com.reporthub.service.implementation;
 
 import com.reporthub.config.AppConfig;
-import com.reporthub.dto.TagDTO;
 import com.reporthub.dto.UserDTO;
-import com.reporthub.entity.Tag;
 import com.reporthub.entity.User;
 import com.reporthub.entity.auth.Authenticated;
 import com.reporthub.repository.IUserRepository;
 import com.reporthub.request.api.auth.UserLoginRequest;
 import com.reporthub.request.api.auth.UserRegisterRequest;
 import com.reporthub.request.api.v1.UserUpdateRequest;
-import com.reporthub.service.IMailService;
-import com.reporthub.service.IUserService;
-import com.reporthub.service.JwtService;
-import com.reporthub.service.Response;
+import com.reporthub.service.*;
 import com.reporthub.exception.IncorrectCredentialsException;
 import com.reporthub.exception.NotFoundException;
 import com.reporthub.exception.UserAlreadyExistsException;
@@ -37,6 +32,8 @@ public class IUserServiceImpl implements IUserService {
     @Autowired private JwtService jwtService;
 
     @Autowired private IMailService mailService;
+
+    @Autowired private ISMSService smsService;
 
     public User save(User entity) { return userRepository.save(entity); }
 
@@ -175,6 +172,7 @@ public class IUserServiceImpl implements IUserService {
                         "\nKind regards,\nteam @reportHub";
 
                 mailService.sendMail(user.getEmail(), "reportHub - about your account", stringBuilder);
+                smsService.sendSms(user.getPhoneNumber(), stringBuilder);
                 user.setIsBanned(request.getBanned());
             }
             if (request.getPassword() != null) {
@@ -183,7 +181,8 @@ public class IUserServiceImpl implements IUserService {
             }
 
             return new Response<>(new UserDTO(this.save(user)), null);
-        }  catch (NotFoundException ex) { message.put("message", ex.getMessage()); }
+        }
+        catch (Exception e) { message.put("message", e.getMessage()); }
 
         return new Response<>(null, message);
     }
