@@ -54,4 +54,15 @@ public class IAuthorizationServiceImpl implements IAuthorizationService {
     public boolean isConnected(Long authenticatedId) {
         return authenticatedId != null;
     }
+
+    @Override
+    public boolean canAppreciatePost(Long authenticatedId, String target) {
+        if(target.contains("com_")) {
+            Optional<Comment> comment = commentRepository.findByKey(target);
+            return (comment.isPresent() && !comment.get().getUser().getId().equals(authenticatedId));
+        }
+
+        Optional<Report> report = reportRepository.findByPostKey(target);
+        return (report.isPresent() && !report.get().getUser().getId().equals(authenticatedId));
+    }
 }

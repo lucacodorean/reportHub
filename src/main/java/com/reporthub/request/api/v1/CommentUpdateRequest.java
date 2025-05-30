@@ -4,6 +4,6 @@ import jakarta.annotation.Nullable;
 import lombok.Getter;
 
 @Getter
-public class CommentUpdateRequest {
+final public class CommentUpdateRequest implements IRequest {
     @Nullable private String content;
 }

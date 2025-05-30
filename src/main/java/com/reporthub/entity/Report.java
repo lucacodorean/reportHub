@@ -1,10 +1,9 @@
 package com.reporthub.entity;
 
+import com.reporthub.dto.CommentDTO;
 import jakarta.persistence.*;
 import lombok.*;
-import com.reporthub.entity.Tag;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -27,7 +26,7 @@ public class Report extends Postable {
     private String title;
 
     @Column(name = "status")
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private Status status = Status.RECEIVED;
 
     @Column(name = "attachment_path")
@@ -40,6 +39,9 @@ public class Report extends Postable {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags;
+
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL)
+    private List<Comment> comments;
 
     public Report(String content, User user, String title, List<Tag> tags) {
         super(content, user);

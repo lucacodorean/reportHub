@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -38,6 +40,9 @@ public abstract class Postable implements IModel {
     @Column(name = "post_key")
     private String post_key = generateKey(this);
 
+    @OneToMany(mappedBy = "postable", cascade = CascadeType.ALL)
+    private Set<PostableRating> ratings;
+
     @Column(name="like_count")
     private Long like_count;
 
@@ -51,5 +56,10 @@ public abstract class Postable implements IModel {
         this.post_key = generateKey(this);
         this.like_count = 0L;
         this.dislike_count = 0L;
+    }
+
+    public Set<PostableRating> getRatings() {
+        if(ratings == null) return new HashSet<>();
+        return ratings;
     }
 }

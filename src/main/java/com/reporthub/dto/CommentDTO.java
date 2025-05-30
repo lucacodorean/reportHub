@@ -18,11 +18,7 @@ public class CommentDTO extends PostableDTO {
     public CommentDTO(Comment comment) {
         super(comment, "comments");
 
-        if (comment != null) {
-            this.reportDTO = new ReportDTO(comment.getReport());
-        }
-
-        super.relationships.put("report", this.getReportDTO());
+        super.relationships.put("user", this.getUserDTO());
 
         super.links.put("this",    AppConfig.getAPILink() + "/comments/" + this.key);
         super.links.put("parent",  AppConfig.getAPILink() + "/comments/");

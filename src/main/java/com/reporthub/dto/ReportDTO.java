@@ -21,6 +21,7 @@ public class ReportDTO extends PostableDTO {
     @JsonIgnore @NonNull  private String status;
     @JsonIgnore @NonNull  private List<TagDTO> tags;
     @JsonIgnore @NonNull  private Resource attachment;
+    @JsonIgnore @NonNull  private List<CommentDTO> comments;
 
     public ReportDTO(Report report) {
         super(report, "reports");
@@ -30,7 +31,12 @@ public class ReportDTO extends PostableDTO {
             super.setUserDTO(new UserDTO(report.getUser()));
             this.title = report.getTitle();
             this.status = report.getStatus().name();
-            this.tags = report.getTags().stream().map(TagDTO::new).collect(Collectors.toList());
+            if(report.getTags() != null) {
+                this.tags = report.getTags().stream().map(TagDTO::new).collect(Collectors.toList());
+            }
+            if(report.getComments() != null) {
+                this.comments = report.getComments().stream().map(CommentDTO::new).collect(Collectors.toList());
+            }
 
             if(report.getAttachment() != null) {
                 super.attributes.put("attachment",AppConfig.getAPIUrl() + "/" +
@@ -44,6 +50,7 @@ public class ReportDTO extends PostableDTO {
         super.attributes.put("status", this.getStatus());
 
         super.relationships.put("tags", this.getTags());
+        super.relationships.put("comments", this.getComments());
 
         super.links.put("this", AppConfig.getAPILink() + "/reports/" + this.getPostKey());
         super.links.put("parent", AppConfig.getAPILink() + "/reports/");

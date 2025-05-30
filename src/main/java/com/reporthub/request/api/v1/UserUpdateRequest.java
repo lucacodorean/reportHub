@@ -4,7 +4,7 @@ import jakarta.annotation.Nullable;
 import lombok.Getter;
 
 @Getter
-public class UserUpdateRequest {
+final public class UserUpdateRequest implements IRequest {
     @Nullable private String username;
     @Nullable private String phoneNumber;
     @Nullable private Float score;

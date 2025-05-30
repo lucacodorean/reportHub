@@ -1,80 +1,51 @@
 package com.reporthub.controller.api.auth;
 
 import com.reporthub.dto.UserDTO;
-import com.reporthub.dto.auth.LoginRequest;
-import com.reporthub.dto.auth.RegisterRequest;
-import com.reporthub.entity.User;
+import com.reporthub.request.api.auth.UserLoginRequest;
+import com.reporthub.request.api.auth.UserRegisterRequest;
 import com.reporthub.service.IUserService;
-import com.reporthub.service.JwtService;
-import com.reporthub.singleton.ServiceSingleton;
+import com.reporthub.service.Response;
+import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("api/v1/auth/")
 public class AuthController {
 
     @Autowired
-    private final IUserService userService = ServiceSingleton.getUserService();
-    @Autowired
-    private JwtService jwtService;
+    private IUserService userService;
 
     @ExceptionHandler({SQLException.class, JDBCException.class})
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request)  {
-        Map<String, String> message = new HashMap<>();
-
-        if(userService.findByEmail(request.getEmail()) != null) {
-            message.put("message", "User with this email already exists.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
-        }
-
-        try {
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-
-            UserDTO loggedUser = new UserDTO(
-                userService.save(
-                    new User(request.getUsername(), request.getEmail(), encoder.encode(request.getPassword()), request.getPhoneNumber())
-                )
-            );
-
-            loggedUser.attributes.put("JWT", userService.verify(loggedUser.getUsername(), request.getPassword()));
-            return ResponseEntity.ok(loggedUser);
-
-        } catch (Exception e) {
-            message.put("message", e.getCause().getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
-        }
+    public ResponseEntity<?> register(@RequestBody UserRegisterRequest request, HttpServletResponse response)  {
+        Response<UserDTO> myResponse = userService.create(request, response);
+        if(myResponse.getEntityDTO() != null) return ResponseEntity.ok(myResponse.getEntityDTO());
+        else return ResponseEntity.badRequest().body(myResponse.retrieveMessages());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-
-        UserDTO user = new UserDTO(userService.findByUsername(request.getUsername()));
-        String JWT = userService.verify(request.getUsername(), request.getPassword());
-        if(Objects.equals(JWT, "Failed")) {
-            Map<String, String> message = new HashMap<>();
-            message.put("message", "User credentials are incorrect.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
-        }
-
-        user.attributes.put("JWT", JWT);
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+    public ResponseEntity<?> login(@RequestBody UserLoginRequest request, HttpServletResponse response) {
+        Response<UserDTO> myResponse = userService.login(request, response);
+        if(myResponse.getEntityDTO() != null) return ResponseEntity.ok(myResponse.getEntityDTO());
+        else return ResponseEntity.badRequest().body(myResponse.retrieveMessages());
     }
 
-    @GetMapping("/connected")
-    public ResponseEntity<UserDTO> getLoggedInUser(@RequestHeader("Authorization") String authHeader) {
-        User user = userService.retrieveLoggedUser(authHeader);
-        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        return ResponseEntity.ok(new UserDTO(user));
+    @PostMapping("/logout")
+    @PreAuthorize("@authorizationService.isConnected(authentication.principal.id)")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        if(!userService.logout(response)) return ResponseEntity.internalServerError().build();
+
+        Map<String, String> message = new HashMap<>();
+        message.put("message", "User has been logged out.");
+        return ResponseEntity.status(HttpStatus.OK).body(message);
     }
 }
