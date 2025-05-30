@@ -1,6 +1,7 @@
 package com.reporthub.config;
 
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -14,12 +15,14 @@ public class AppConfig implements WebMvcConfigurer {
     @Value("${app.api_port}")    private  String apiPort;
     @Value("${spring.servlet.multipart.location}") private String attachmentLocation;
     @Value("${app.email_address}")   private  String emailAddress;
+    @Value("${app.email.service.url}")  private  String emailServiceUrl;
 
     private static String API_URL;
     private static String API_VERSION;
     private static String API_PORT;
     private static String ATTACHMENT_PATH;
     private static String EMAIL_ADDRESS;
+    private static String EMAIL_SERVICE_URL;
 
     @PostConstruct
     public void init() {
@@ -28,7 +31,10 @@ public class AppConfig implements WebMvcConfigurer {
         API_PORT = apiPort;
         ATTACHMENT_PATH = attachmentLocation;
         EMAIL_ADDRESS = emailAddress;
+        EMAIL_SERVICE_URL = emailServiceUrl;
     }
+
+    public static String getEmailServiceUrl() { return EMAIL_SERVICE_URL; }
 
     public static String getAPILink() {
         return API_URL + ":" + API_PORT + "/api/" + API_VERSION;
